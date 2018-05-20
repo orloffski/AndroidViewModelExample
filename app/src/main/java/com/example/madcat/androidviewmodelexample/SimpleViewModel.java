@@ -10,6 +10,8 @@ public class SimpleViewModel extends ViewModel {
     MutableLiveData<String> data;
     MutableLiveData<String> statusData;
 
+    TestAsync t;
+
     public LiveData<String> getData() {
         if (data == null) {
             data = new MutableLiveData<>();
@@ -25,7 +27,7 @@ public class SimpleViewModel extends ViewModel {
     }
 
     public void loadData(final Integer count){
-        TestAsync t = new TestAsync();
+        t = new TestAsync();
         t.execute(count);
     }
 
@@ -35,6 +37,10 @@ public class SimpleViewModel extends ViewModel {
         @Override
         protected Void doInBackground(Integer... integers) {
             for(int i = 1; i <= integers[0]; i++){
+                if(isCancelled()){
+                    break;
+                }
+
                 data.postValue("test value: " + i);
 
                 publishProgress(i, integers[0]);
@@ -53,5 +59,13 @@ public class SimpleViewModel extends ViewModel {
 
             statusData.setValue(values[0] + " from " + values[1] + " loaded");
         }
+    }
+
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+
+        // clear resources
+        t.cancel(true);
     }
 }
