@@ -34,6 +34,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         model = ViewModelProviders.of(this).get(SimpleViewModel.class);
         LiveData<String> data = model.getData();
+        LiveData<String> statusData = model.getStatusData();
 
         data.observe(this, new Observer<String>() {
             @Override
@@ -44,6 +45,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 buffer.append(s).append("\n");
 
                 viewText.setText(buffer.toString());
+            }
+        });
+
+        statusData.observe(this, new Observer<String>() {
+            @Override
+            public void onChanged(@Nullable String s) {
+                newText.setText(s);
             }
         });
     }
@@ -58,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.clearButton:
                 viewText.setText("");
+                newText.setText("");
                 break;
         }
     }

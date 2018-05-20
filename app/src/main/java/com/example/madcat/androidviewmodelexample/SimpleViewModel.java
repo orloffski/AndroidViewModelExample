@@ -8,6 +8,7 @@ import android.os.AsyncTask;
 public class SimpleViewModel extends ViewModel {
 
     MutableLiveData<String> data;
+    MutableLiveData<String> statusData;
 
     public LiveData<String> getData() {
         if (data == null) {
@@ -16,18 +17,27 @@ public class SimpleViewModel extends ViewModel {
         return data;
     }
 
+    public LiveData<String> getStatusData() {
+        if (statusData == null) {
+            statusData = new MutableLiveData<>();
+        }
+        return statusData;
+    }
+
     public void loadData(final Integer count){
         TestAsync t = new TestAsync();
         t.execute(count);
     }
 
     // async data added task
-    private class TestAsync extends AsyncTask<Integer, Void, Void>{
+    private class TestAsync extends AsyncTask<Integer, Integer, Void>{
 
         @Override
         protected Void doInBackground(Integer... integers) {
             for(int i = 1; i <= integers[0]; i++){
                 data.postValue("test value: " + i);
+
+                publishProgress(i, integers[0]);
                 try {
                     Thread.sleep(1500);
                 } catch (InterruptedException e) {
@@ -35,6 +45,13 @@ public class SimpleViewModel extends ViewModel {
                 }
             }
             return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            super.onProgressUpdate(values);
+
+            statusData.setValue(values[0] + " from " + values[1] + " loaded");
         }
     }
 }
