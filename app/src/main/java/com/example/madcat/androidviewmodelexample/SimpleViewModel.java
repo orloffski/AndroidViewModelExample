@@ -1,16 +1,27 @@
 package com.example.madcat.androidviewmodelexample;
 
+import android.app.Application;
+import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.ViewModel;
+import android.content.Context;
 import android.os.AsyncTask;
+import android.widget.Toast;
 
-public class SimpleViewModel extends ViewModel {
+public class SimpleViewModel extends AndroidViewModel {
 
     MutableLiveData<String> data;
     MutableLiveData<String> statusData;
 
     TestAsync t;
+
+    Context context;
+
+    public SimpleViewModel(Application application) {
+        super(application);
+
+        context = getApplication();
+    }
 
     public LiveData<String> getData() {
         if (data == null) {
@@ -58,6 +69,13 @@ public class SimpleViewModel extends ViewModel {
             super.onProgressUpdate(values);
 
             statusData.setValue(values[0] + " from " + values[1] + " loaded");
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+            Toast.makeText(context, "Data load end", Toast.LENGTH_SHORT).show();
         }
     }
 
